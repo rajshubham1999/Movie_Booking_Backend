@@ -5,8 +5,19 @@ const Show = require("../models/showModel");
 const router = require("express").Router();
 const stripe = require("stripe")(process.env.stripe_key);
 
-router.post("/make-payment", authMiddleware, async (_, res) => {
+
+
+router.post("/make-payment", authMiddleware, async (req, res) => {
   try {
+    const { amount } = req.body; // Extract amount from request body
+
+    if (!amount) {
+      return res.send({
+        success: false,
+        message: "Amount is required",
+      });
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "INR",
@@ -26,6 +37,7 @@ router.post("/make-payment", authMiddleware, async (_, res) => {
     });
   }
 });
+
 
 router.post("/book-show", authMiddleware, async (req, res) => {
   try {
